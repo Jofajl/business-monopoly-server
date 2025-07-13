@@ -7,8 +7,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: [
+      "business-monopoly-client-pzb9.vercel.app",  // Your actual Vercel URL
+      "http://localhost:3000",                     // For local testing
+      "http://localhost:5173"                      // Common Vite port
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
