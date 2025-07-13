@@ -19,8 +19,273 @@ app.use(express.json());
 const rooms = new Map();
 const playerStats = new Map();
 
-// Enhanced question bank with categories, difficulties, and explanations
+// Monopoly board properties
+const boardSpaces = [
+  { name: 'GO', type: 'corner', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Old Kent Road', type: 'property', color: 'brown', price: 60, rent: [2, 10, 30, 90, 160, 250], group: 'brown' },
+  { name: 'Community Chest', type: 'chest', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Whitechapel Road', type: 'property', color: 'brown', price: 60, rent: [4, 20, 60, 180, 320, 450], group: 'brown' },
+  { name: 'Income Tax', type: 'tax', color: '', price: 0, rent: [200], group: '' },
+  { name: "King's Cross Station", type: 'station', color: 'black', price: 200, rent: [25, 50, 100, 200], group: 'station' },
+  { name: 'The Angel Islington', type: 'property', color: 'lightblue', price: 100, rent: [6, 30, 90, 270, 400, 550], group: 'lightblue' },
+  { name: 'Chance', type: 'chance', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Euston Road', type: 'property', color: 'lightblue', price: 100, rent: [6, 30, 90, 270, 400, 550], group: 'lightblue' },
+  { name: 'Pentonville Road', type: 'property', color: 'lightblue', price: 120, rent: [8, 40, 100, 300, 450, 600], group: 'lightblue' },
+  { name: 'Jail', type: 'corner', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Pall Mall', type: 'property', color: 'pink', price: 140, rent: [10, 50, 150, 450, 625, 750], group: 'pink' },
+  { name: 'Electric Company', type: 'utility', color: 'yellow', price: 150, rent: [0], group: 'utility' },
+  { name: 'Whitehall', type: 'property', color: 'pink', price: 140, rent: [10, 50, 150, 450, 625, 750], group: 'pink' },
+  { name: 'Northumberland Avenue', type: 'property', color: 'pink', price: 160, rent: [12, 60, 180, 500, 700, 900], group: 'pink' },
+  { name: 'Marylebone Station', type: 'station', color: 'black', price: 200, rent: [25, 50, 100, 200], group: 'station' },
+  { name: 'Bow Street', type: 'property', color: 'orange', price: 180, rent: [14, 70, 200, 550, 750, 950], group: 'orange' },
+  { name: 'Community Chest', type: 'chest', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Marlborough Street', type: 'property', color: 'orange', price: 180, rent: [14, 70, 200, 550, 750, 950], group: 'orange' },
+  { name: 'Vine Street', type: 'property', color: 'orange', price: 200, rent: [16, 80, 220, 600, 800, 1000], group: 'orange' },
+  { name: 'Free Parking', type: 'corner', color: '', price: 0, rent: [0], group: '' },
+  { name: 'The Strand', type: 'property', color: 'red', price: 220, rent: [18, 90, 250, 700, 875, 1050], group: 'red' },
+  { name: 'Chance', type: 'chance', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Fleet Street', type: 'property', color: 'red', price: 220, rent: [18, 90, 250, 700, 875, 1050], group: 'red' },
+  { name: 'Trafalgar Square', type: 'property', color: 'red', price: 240, rent: [20, 100, 300, 750, 925, 1100], group: 'red' },
+  { name: 'Fenchurch St Station', type: 'station', color: 'black', price: 200, rent: [25, 50, 100, 200], group: 'station' },
+  { name: 'Leicester Square', type: 'property', color: 'yellow', price: 260, rent: [22, 110, 330, 800, 975, 1150], group: 'yellow' },
+  { name: 'Coventry Street', type: 'property', color: 'yellow', price: 260, rent: [22, 110, 330, 800, 975, 1150], group: 'yellow' },
+  { name: 'Water Works', type: 'utility', color: 'yellow', price: 150, rent: [0], group: 'utility' },
+  { name: 'Piccadilly', type: 'property', color: 'yellow', price: 280, rent: [24, 120, 360, 850, 1025, 1200], group: 'yellow' },
+  { name: 'Go To Jail', type: 'corner', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Regent Street', type: 'property', color: 'green', price: 300, rent: [26, 130, 390, 900, 1100, 1275], group: 'green' },
+  { name: 'Oxford Street', type: 'property', color: 'green', price: 300, rent: [26, 130, 390, 900, 1100, 1275], group: 'green' },
+  { name: 'Community Chest', type: 'chest', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Bond Street', type: 'property', color: 'green', price: 320, rent: [28, 150, 450, 1000, 1200, 1400], group: 'green' },
+  { name: 'Liverpool St Station', type: 'station', color: 'black', price: 200, rent: [25, 50, 100, 200], group: 'station' },
+  { name: 'Chance', type: 'chance', color: '', price: 0, rent: [0], group: '' },
+  { name: 'Park Lane', type: 'property', color: 'blue', price: 350, rent: [35, 175, 500, 1100, 1300, 1500], group: 'blue' },
+  { name: 'Super Tax', type: 'tax', color: '', price: 0, rent: [100], group: '' },
+  { name: 'Mayfair', type: 'property', color: 'blue', price: 400, rent: [50, 200, 600, 1400, 1700, 2000], group: 'blue' }
+];
+
+// Enhanced question bank with categories, difficulties, and explanations based on T Level textbook
 const questionBank = {
+  // Change Management Questions
+  change_management: {
+    easy: [
+      {
+        question: "What are the two main types of drivers for organizational change?",
+        options: ["Internal and external", "Planned and unplanned", "Financial and operational", "Strategic and tactical"],
+        correctAnswer: 0,
+        explanation: "Organizational change can be driven by internal factors (within the company) or external factors (outside the company's control) such as government policy or market changes."
+      },
+      {
+        question: "What does SWOT analysis stand for?",
+        options: ["Systems, Work, Operations, Technology", "Strengths, Weaknesses, Opportunities, Threats", "Strategic, Workplace, Organizational, Teams", "Skills, Workforce, Objectives, Tasks"],
+        correctAnswer: 1,
+        explanation: "SWOT analysis is a strategic planning tool that examines internal Strengths and Weaknesses, and external Opportunities and Threats."
+      },
+      {
+        question: "What is resistance to change?",
+        options: ["When employees welcome new ideas", "When people are reluctant to accept changes", "When management implements changes quickly", "When changes are successful"],
+        correctAnswer: 1,
+        explanation: "Resistance to change occurs when individuals or groups are reluctant to accept or adapt to new ways of working, often due to fear of the unknown."
+      }
+    ],
+    medium: [
+      {
+        question: "According to Kotter's 8-Step Model, what is the first step in change management?",
+        options: ["Build the team", "Develop the vision", "Increase urgency", "Communicate for buy-in"],
+        correctAnswer: 2,
+        explanation: "Kotter's first step is to 'Increase urgency' by identifying potential threats and exploring opportunities for action to create a sense of urgency for change."
+      },
+      {
+        question: "In PESTLE analysis, what does the 'E' represent?",
+        options: ["Economic and Environmental", "External and Ethical", "Economic only", "Environmental only"],
+        correctAnswer: 0,
+        explanation: "PESTLE analysis examines Political, Economic, Social, Technological, Legal, and Environmental factors. The 'E' covers both Economic and Environmental factors."
+      },
+      {
+        question: "What are the three phases in Lewin's Change Management Model?",
+        options: ["Plan, Do, Review", "Unfreeze, Change, Refreeze", "Initiate, Implement, Evaluate", "Analyze, Act, Assess"],
+        correctAnswer: 1,
+        explanation: "Lewin's model involves Unfreezing (preparing for change), Change (implementing the change), and Refreezing (establishing the new way as normal)."
+      }
+    ],
+    hard: [
+      {
+        question: "What does the ADKAR model focus on?",
+        options: ["Organizational systems", "Individual change journey", "Financial planning", "Strategic planning"],
+        correctAnswer: 1,
+        explanation: "ADKAR focuses on how individuals travel through change: Awareness, Desire, Knowledge, Ability, and Reinforcement, emphasizing the human side of change."
+      },
+      {
+        question: "In the McKinsey 7-S Model, which elements are considered 'soft' elements?",
+        options: ["Strategy, Structure, Systems", "Shared values, Skills, Style, Staff", "All seven elements equally", "Only shared values"],
+        correctAnswer: 1,
+        explanation: "The McKinsey 7-S Model divides elements into hard (Strategy, Structure, Systems) and soft (Shared values, Skills, Style, Staff) elements."
+      }
+    ]
+  },
+
+  // Project Management Questions
+  project_management: {
+    easy: [
+      {
+        question: "What are the four stages of the project lifecycle?",
+        options: ["Plan, Build, Test, Deploy", "Initiation, Planning, Execution, Closure", "Research, Design, Develop, Deliver", "Start, Middle, End, Review"],
+        correctAnswer: 1,
+        explanation: "The project lifecycle consists of Initiation (starting the project), Planning (detailed planning), Execution (doing the work), and Closure (completing and reviewing)."
+      },
+      {
+        question: "What does PRINCE stand for in project management?",
+        options: ["Projects in Controlled Environments", "Primary Resource in Creative Enterprises", "Planned Resources in Corporate Environments", "Professional Resource Integration"],
+        correctAnswer: 0,
+        explanation: "PRINCE stands for PRojects IN Controlled Environments, a structured project management methodology used worldwide."
+      },
+      {
+        question: "What is a milestone in project management?",
+        options: ["A long task", "A checkpoint marking significant progress", "The project budget", "A team member"],
+        correctAnswer: 1,
+        explanation: "A milestone is a checkpoint that highlights significant progress, achievement, or event toward the project goal, helping track progress."
+      }
+    ],
+    medium: [
+      {
+        question: "What is the main focus of Six Sigma methodology?",
+        options: ["Increasing revenue", "Improving processes and reducing errors", "Hiring more staff", "Expanding markets"],
+        correctAnswer: 1,
+        explanation: "Six Sigma aims to improve business processes, reduce waste and errors, and increase customer satisfaction through data-driven analysis."
+      },
+      {
+        question: "In Agile project management, what are 'sprints'?",
+        options: ["Long-term goals", "Short development cycles", "Budget reviews", "Team meetings"],
+        correctAnswer: 1,
+        explanation: "Sprints are short, time-boxed iterations (usually 2 weeks) where teams work to complete specific goals in Agile methodology."
+      },
+      {
+        question: "What is Critical Path Analysis (CPA) used for?",
+        options: ["Managing budgets", "Identifying the longest sequence of tasks", "Hiring staff", "Marketing products"],
+        correctAnswer: 1,
+        explanation: "CPA identifies the critical path - the longest sequence of dependent tasks that determines the minimum project duration."
+      }
+    ],
+    hard: [
+      {
+        question: "What is the Pareto Principle in project management?",
+        options: ["All tasks are equally important", "80% of consequences come from 20% of causes", "Projects should take 80% of available time", "Teams should be 80% efficient"],
+        correctAnswer: 1,
+        explanation: "The Pareto Principle (80/20 rule) suggests that 80% of problems typically come from 20% of causes, helping teams focus on the most impactful issues."
+      },
+      {
+        question: "In SCRUM methodology, what is the role of the SCRUM Master?",
+        options: ["Makes all project decisions", "Facilitates the process and removes obstacles", "Writes all the code", "Manages the budget"],
+        correctAnswer: 1,
+        explanation: "The SCRUM Master facilitates the SCRUM process, helps remove obstacles, keeps the team on track, and coaches team members when needed."
+      }
+    ]
+  },
+
+  // Business Research Questions
+  business_research: {
+    easy: [
+      {
+        question: "What is primary research?",
+        options: ["Research done by universities", "Original research conducted for a specific purpose", "Research that's most important", "Research done first"],
+        correctAnswer: 1,
+        explanation: "Primary research is original research conducted by a business for their specific needs, such as surveys, interviews, or observations."
+      },
+      {
+        question: "What is the difference between qualitative and quantitative data?",
+        options: ["No difference", "Qualitative is opinions, quantitative is numbers", "Qualitative is faster to collect", "Quantitative is always better"],
+        correctAnswer: 1,
+        explanation: "Qualitative data includes opinions, views, and thoughts, while quantitative data involves numbers and statistical information."
+      },
+      {
+        question: "What is market research used for?",
+        options: ["Only to increase prices", "To understand customer needs and wants", "To reduce staff", "To close businesses"],
+        correctAnswer: 1,
+        explanation: "Market research helps businesses understand customer needs, wants, and preferences to make informed decisions about products and services."
+      }
+    ],
+    medium: [
+      {
+        question: "What is a focus group?",
+        options: ["A large survey", "A small group discussing specific topics", "Individual interviews", "Online research"],
+        correctAnswer: 1,
+        explanation: "A focus group is a small group of people brought together to discuss and provide feedback on specific topics, products, or services."
+      },
+      {
+        question: "What are the advantages of secondary research?",
+        options: ["More expensive than primary", "Quick and readily available", "Always up to date", "Only available to large companies"],
+        correctAnswer: 1,
+        explanation: "Secondary research uses existing data and information, making it quick to access, readily available, and typically less expensive than primary research."
+      },
+      {
+        question: "What is web analytics used for?",
+        options: ["Creating websites", "Measuring website performance and user behavior", "Designing graphics", "Writing content"],
+        correctAnswer: 1,
+        explanation: "Web analytics involves collecting, measuring, and analyzing web data to understand website usage, visitor behavior, and effectiveness."
+      }
+    ],
+    hard: [
+      {
+        question: "How can validity and reliability be ensured in research?",
+        options: ["By using only primary research", "By asking relevant, unbiased questions and using appropriate methods", "By collecting as much data as possible", "By using only quantitative methods"],
+        correctAnswer: 1,
+        explanation: "Validity and reliability are ensured by using appropriate research methods, asking relevant and unbiased questions, and ensuring data is suitable for its intended purpose."
+      },
+      {
+        question: "What is triangulation in research?",
+        options: ["Using three researchers", "Using multiple methods to validate findings", "Conducting research in three locations", "Taking three months to complete"],
+        correctAnswer: 1,
+        explanation: "Triangulation involves using multiple research methods or sources to validate findings and increase the reliability and validity of research results."
+      }
+    ]
+  },
+
+  // Innovation and Improvement Questions
+  innovation_improvement: {
+    easy: [
+      {
+        question: "What is continuous improvement?",
+        options: ["Making one big change", "Constantly looking for ways to improve", "Changing everything at once", "Avoiding any changes"],
+        correctAnswer: 1,
+        explanation: "Continuous improvement involves constantly seeking ways to enhance business processes, products, and services to remain competitive and efficient."
+      },
+      {
+        question: "What is Kaizen?",
+        options: ["A Japanese car company", "A continuous improvement philosophy", "A type of technology", "A management style"],
+        correctAnswer: 1,
+        explanation: "Kaizen is a Japanese business philosophy focusing on gradual, continuous improvement involving all employees from management to workers."
+      },
+      {
+        question: "Why is innovation important for businesses?",
+        options: ["It's not important", "It helps businesses stay competitive", "It's only for tech companies", "It's too expensive"],
+        correctAnswer: 1,
+        explanation: "Innovation helps businesses adapt to changing markets, stay competitive, improve efficiency, and meet evolving customer needs."
+      }
+    ],
+    medium: [
+      {
+        question: "What is the difference between sustaining and disruptive innovation?",
+        options: ["No difference", "Sustaining improves existing products, disruptive creates new markets", "Sustaining is cheaper", "Disruptive is always better"],
+        correctAnswer: 1,
+        explanation: "Sustaining innovation improves existing products for current customers, while disruptive innovation creates new markets or business models."
+      },
+      {
+        question: "What are the benefits of Total Quality Management (TQM)?",
+        options: ["Higher costs", "Improved quality and customer satisfaction", "More complexity", "Slower processes"],
+        correctAnswer: 1,
+        explanation: "TQM focuses on improving quality, reducing errors, increasing customer satisfaction, and involving all employees in quality improvement."
+      }
+    ],
+    hard: [
+      {
+        question: "How can businesses create a culture of continuous improvement?",
+        options: ["By avoiding change", "By encouraging employee involvement and learning from mistakes", "By punishing errors", "By focusing only on profits"],
+        correctAnswer: 1,
+        explanation: "A culture of continuous improvement requires encouraging employee involvement, learning from mistakes, celebrating improvements, and supporting innovation."
+      }
+    ]
+  },
+
+  // General Business Questions
   general: {
     easy: [
       {
@@ -34,186 +299,22 @@ const questionBank = {
         options: ["Only company shareholders", "Anyone affected by business decisions", "Only employees", "Only customers"],
         correctAnswer: 1,
         explanation: "Stakeholders include anyone who has an interest in or is affected by a company's activities - employees, customers, suppliers, shareholders, and the community."
-      },
-      {
-        question: "What does B2B stand for?",
-        options: ["Business to Business", "Back to Basics", "Buy to Build", "Brand to Brand"],
-        correctAnswer: 0,
-        explanation: "B2B (Business to Business) refers to transactions and relationships between companies rather than between companies and individual consumers."
       }
     ],
     medium: [
       {
-        question: "In SWOT analysis, what does the 'T' represent?",
-        options: ["Targets", "Threats", "Trends", "Tactics"],
+        question: "What is sustainability in business?",
+        options: ["Making quick profits", "Meeting present needs without compromising future generations", "Expanding rapidly", "Reducing workforce"],
         correctAnswer: 1,
-        explanation: "SWOT stands for Strengths, Weaknesses, Opportunities, and Threats. It's a strategic planning framework for evaluating these four elements."
-      },
-      {
-        question: "What is market segmentation?",
-        options: ["Dividing markets into distinct groups", "Combining all markets", "Setting market prices", "Market research methods"],
-        correctAnswer: 0,
-        explanation: "Market segmentation involves dividing a broad target market into smaller, more specific groups of consumers with similar needs or characteristics."
-      },
-      {
-        question: "What is a USP in marketing?",
-        options: ["Universal Sales Process", "Unique Selling Proposition", "United States Patent", "User Service Platform"],
-        correctAnswer: 1,
-        explanation: "A USP (Unique Selling Proposition) is what makes your product or service different from and better than competitors in the minds of customers."
+        explanation: "Business sustainability involves operating in ways that meet current needs while preserving resources and opportunities for future generations."
       }
     ],
     hard: [
       {
-        question: "What is the difference between working capital and net working capital?",
-        options: ["No difference", "Working capital includes all assets", "Net working capital subtracts current liabilities", "Working capital is always negative"],
-        correctAnswer: 2,
-        explanation: "Working capital is current assets minus current liabilities, while net working capital specifically refers to this calculation. The terms are often used interchangeably."
-      },
-      {
-        question: "In financial analysis, what does EBITDA stand for?",
-        options: ["Earnings Before Interest, Taxes, Depreciation, Amortization", "Estimated Business Income and Tax Analysis", "European Business Investment Data", "Earnings Based on International Trade Agreements"],
-        correctAnswer: 0,
-        explanation: "EBITDA is a measure of a company's overall financial performance, excluding certain non-cash and non-operating expenses to focus on operational profitability."
-      }
-    ]
-  },
-  finance: {
-    easy: [
-      {
-        question: "What is cash flow?",
-        options: ["Money coming in and going out", "Only money coming in", "Only money going out", "Total company assets"],
-        correctAnswer: 0,
-        explanation: "Cash flow is the movement of money in and out of a business, crucial for understanding financial health and liquidity."
-      },
-      {
-        question: "What does break-even point mean?",
-        options: ["Maximum profit point", "Point where costs equal revenue", "Minimum sales target", "End of fiscal year"],
+        question: "How do external factors influence business strategy?",
+        options: ["They don't influence strategy", "They require businesses to adapt and respond to maintain competitiveness", "They only affect large companies", "They are easy to control"],
         correctAnswer: 1,
-        explanation: "The break-even point is where total costs equal total revenue, meaning the business neither makes a profit nor a loss."
-      }
-    ],
-    medium: [
-      {
-        question: "What is the purpose of a budget variance analysis?",
-        options: ["To increase budgets", "To compare actual vs planned performance", "To reduce expenses", "To forecast future sales"],
-        correctAnswer: 1,
-        explanation: "Budget variance analysis compares actual financial performance against budgeted figures to identify differences and understand their causes."
-      },
-      {
-        question: "What is depreciation in accounting?",
-        options: ["Increase in asset value", "Decrease in asset value over time", "Tax payment", "Interest expense"],
-        correctAnswer: 1,
-        explanation: "Depreciation is the systematic allocation of an asset's cost over its useful life, reflecting how assets lose value due to use, wear, or obsolescence."
-      }
-    ],
-    hard: [
-      {
-        question: "What is the weighted average cost of capital (WACC)?",
-        options: ["Average interest rate", "Cost of equity only", "Blended cost of debt and equity financing", "Total company expenses"],
-        correctAnswer: 2,
-        explanation: "WACC represents the average cost of capital from all sources (debt and equity), weighted by their respective proportions in the company's capital structure."
-      }
-    ]
-  },
-  marketing: {
-    easy: [
-      {
-        question: "What are the 4 Ps of marketing?",
-        options: ["Price, Product, Place, Promotion", "People, Process, Product, Price", "Profit, Product, Place, Price", "Product, Price, Performance, Place"],
-        correctAnswer: 0,
-        explanation: "The 4 Ps are the fundamental elements of the marketing mix: Product (what you sell), Price (how much), Place (where you sell), and Promotion (how you advertise)."
-      },
-      {
-        question: "What is a target market?",
-        options: ["All potential customers", "Specific group of potential customers", "Competitors", "Sales team"],
-        correctAnswer: 1,
-        explanation: "A target market is a specific group of consumers most likely to buy your product or service, identified through demographic, psychographic, and behavioral characteristics."
-      }
-    ],
-    medium: [
-      {
-        question: "What is customer lifetime value (CLV)?",
-        options: ["One-time purchase amount", "Total value of customer relationship", "Monthly subscription fee", "Customer satisfaction score"],
-        correctAnswer: 1,
-        explanation: "CLV predicts the total revenue a business can expect from a single customer throughout their entire relationship with the company."
-      },
-      {
-        question: "What is the conversion rate in digital marketing?",
-        options: ["Website loading speed", "Percentage of visitors who take desired action", "Number of website views", "Social media followers"],
-        correctAnswer: 1,
-        explanation: "Conversion rate is the percentage of website visitors or leads who complete a desired action, such as making a purchase or signing up for a newsletter."
-      }
-    ],
-    hard: [
-      {
-        question: "What is attribution modeling in digital marketing?",
-        options: ["Giving credit to team members", "Assigning value to touchpoints in customer journey", "Creating customer personas", "Setting marketing budgets"],
-        correctAnswer: 1,
-        explanation: "Attribution modeling determines how credit for conversions is assigned to different touchpoints in the customer journey, helping marketers understand which channels drive results."
-      }
-    ]
-  },
-  strategy: {
-    easy: [
-      {
-        question: "What is a competitive advantage?",
-        options: ["Having more employees", "Something that gives you an edge over competitors", "Higher prices", "Larger office space"],
-        correctAnswer: 1,
-        explanation: "Competitive advantage is any factor that allows a company to differentiate its products or services from competitors and attract customers more effectively."
-      }
-    ],
-    medium: [
-      {
-        question: "What is Porter's Five Forces model used for?",
-        options: ["Employee management", "Analyzing industry competition", "Financial planning", "Product development"],
-        correctAnswer: 1,
-        explanation: "Porter's Five Forces analyzes the competitive environment by examining: supplier power, buyer power, competitive rivalry, threat of substitution, and threat of new entry."
-      },
-      {
-        question: "What is a blue ocean strategy?",
-        options: ["Ocean conservation efforts", "Creating uncontested market space", "Naval business operations", "Water industry strategies"],
-        correctAnswer: 1,
-        explanation: "Blue ocean strategy involves creating new market space where competition is irrelevant, rather than competing in existing markets (red oceans)."
-      }
-    ],
-    hard: [
-      {
-        question: "What is the BCG Growth-Share Matrix used for?",
-        options: ["Employee performance", "Portfolio analysis of business units", "Financial forecasting", "Market research"],
-        correctAnswer: 1,
-        explanation: "The BCG Matrix categorizes business units as Stars, Cash Cows, Question Marks, or Dogs based on market growth rate and relative market share to guide investment decisions."
-      }
-    ]
-  },
-  operations: {
-    easy: [
-      {
-        question: "What is supply chain management?",
-        options: ["Managing only suppliers", "Coordinating entire flow from raw materials to customers", "Managing only inventory", "Managing only delivery"],
-        correctAnswer: 1,
-        explanation: "Supply chain management involves coordinating and optimizing the entire flow of goods, services, and information from raw materials to end customers."
-      }
-    ],
-    medium: [
-      {
-        question: "What is Just-in-Time (JIT) inventory?",
-        options: ["Always having excess inventory", "Receiving inventory only when needed", "Annual inventory orders", "Random inventory timing"],
-        correctAnswer: 1,
-        explanation: "JIT is an inventory strategy where materials and products are received only when needed in the production process, reducing carrying costs and waste."
-      },
-      {
-        question: "What is Six Sigma?",
-        options: ["Six-step process", "Quality improvement methodology", "Six-month planning", "Six-person team"],
-        correctAnswer: 1,
-        explanation: "Six Sigma is a data-driven methodology for eliminating defects and improving processes by reducing variation and achieving near-perfect quality (99.99966% defect-free)."
-      }
-    ],
-    hard: [
-      {
-        question: "What is the Theory of Constraints (TOC)?",
-        options: ["Legal restrictions", "Methodology focusing on the weakest link", "Employee limitations", "Budget constraints"],
-        correctAnswer: 1,
-        explanation: "TOC is a methodology that identifies the most important limiting factor (constraint) in achieving a goal and systematically improves that constraint until it's no longer the limiting factor."
+        explanation: "External factors like economic conditions, regulations, and market changes require businesses to adapt their strategies to remain competitive and viable."
       }
     ]
   }
@@ -224,18 +325,38 @@ function generateRoomCode() {
   return Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
-function getRandomQuestion(difficulty, category) {
-  const questions = questionBank[category]?.[difficulty] || questionBank.general[difficulty];
-  if (!questions || questions.length === 0) {
-    return questionBank.general.medium[0]; // Fallback
+function getRandomQuestion() {
+  // Flatten all questions from all categories and difficulties into one array
+  const allQuestions = [];
+  
+  Object.keys(questionBank).forEach(category => {
+    Object.keys(questionBank[category]).forEach(difficulty => {
+      questionBank[category][difficulty].forEach(question => {
+        allQuestions.push({
+          ...question,
+          category,
+          difficulty,
+          timeLimit: difficulty === 'easy' ? 45 : difficulty === 'medium' ? 30 : 20
+        });
+      });
+    });
+  });
+  
+  if (allQuestions.length === 0) {
+    // Fallback question if no questions are available
+    return {
+      question: "What does ROI stand for?",
+      options: ["Return on Investment", "Rate of Interest", "Risk of Investment", "Revenue of Income"],
+      correctAnswer: 0,
+      explanation: "ROI (Return on Investment) measures the efficiency of an investment by comparing the gain or loss relative to its cost.",
+      category: 'general',
+      difficulty: 'medium',
+      timeLimit: 30
+    };
   }
-  const randomIndex = Math.floor(Math.random() * questions.length);
-  return {
-    ...questions[randomIndex],
-    difficulty,
-    category,
-    timeLimit: difficulty === 'easy' ? 45 : difficulty === 'medium' ? 30 : 20
-  };
+  
+  const randomIndex = Math.floor(Math.random() * allQuestions.length);
+  return allQuestions[randomIndex];
 }
 
 function initializePlayerStats(playerName) {
@@ -280,6 +401,64 @@ function getPlayerStatsForRoom(roomPlayers) {
   return roomStats;
 }
 
+function calculateRent(propertyIndex, owner, properties, diceTotal = 0) {
+  const space = boardSpaces[propertyIndex];
+  const property = properties.find(p => p.index === propertyIndex);
+  
+  if (!property || !owner) return 0;
+  
+  if (space.type === 'utility') {
+    const utilityCount = properties.filter(p => 
+      boardSpaces[p.index].group === 'utility' && p.owner === owner
+    ).length;
+    return utilityCount === 1 ? diceTotal * 4 : diceTotal * 10;
+  }
+  
+  if (space.type === 'station') {
+    const stationCount = properties.filter(p => 
+      boardSpaces[p.index].group === 'station' && p.owner === owner
+    ).length;
+    return space.rent[stationCount - 1] || 0;
+  }
+  
+  if (space.type === 'property') {
+    const groupProperties = properties.filter(p => 
+      boardSpaces[p.index].group === space.group && p.owner === owner
+    );
+    const groupSize = boardSpaces.filter(s => s.group === space.group).length;
+    const ownsFullGroup = groupProperties.length === groupSize;
+    
+    if (property.hotel) return space.rent[5];
+    if (property.houses > 0) return space.rent[property.houses];
+    if (ownsFullGroup) return space.rent[1]; // Double rent for full group
+    return space.rent[0]; // Base rent
+  }
+  
+  return 0;
+}
+
+function canBuildHouses(propertyIndex, owner, properties) {
+  const space = boardSpaces[propertyIndex];
+  if (space.type !== 'property') return false;
+  
+  const groupProperties = properties.filter(p => 
+    boardSpaces[p.index].group === space.group && p.owner === owner
+  );
+  const groupSize = boardSpaces.filter(s => s.group === space.group).length;
+  
+  return groupProperties.length === groupSize; // Must own full color group
+}
+
+function initializeProperties() {
+  return boardSpaces.map((space, index) => ({
+    index,
+    owner: null,
+    houses: 0,
+    hotel: false,
+    mortgaged: false
+  }));
+}
+
 // Timer management
 const timers = new Map();
 
@@ -296,7 +475,6 @@ function startQuestionTimer(roomCode, timeLimit) {
     if (timeLeft <= 0) {
       clearInterval(timer);
       timers.delete(roomCode);
-      // Auto-submit if no answer given
       const room = rooms.get(roomCode);
       if (room && room.waitingForAnswer) {
         handleQuestionTimeout(roomCode);
@@ -314,7 +492,6 @@ function handleQuestionTimeout(roomCode) {
   const currentPlayer = room.players[room.currentPlayer];
   const question = room.currentQuestion;
   
-  // Update stats for timeout (incorrect answer)
   updatePlayerStats(currentPlayer.name, false, question.timeLimit);
   
   io.to(roomCode).emit('answerResult', {
@@ -337,7 +514,7 @@ function handleQuestionTimeout(roomCode) {
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  socket.on('createRoom', ({ playerName, difficulty = 'medium', category = 'general' }) => {
+  socket.on('createRoom', ({ playerName }) => {
     const roomCode = generateRoomCode();
     const player = {
       id: socket.id,
@@ -355,11 +532,11 @@ io.on('connection', (socket) => {
       players: [player],
       gameStarted: false,
       currentPlayer: 0,
-      difficulty,
-      category,
       waitingForAnswer: false,
       currentQuestion: null,
-      questionStartTime: null
+      questionStartTime: null,
+      properties: initializeProperties(),
+      gamePhase: 'question'
     };
 
     rooms.set(roomCode, room);
@@ -401,22 +578,6 @@ io.on('connection', (socket) => {
     io.to(roomCode).emit('playersUpdated', room.players);
   });
 
-  socket.on('changeDifficulty', ({ roomCode, difficulty }) => {
-    const room = rooms.get(roomCode);
-    if (room && !room.gameStarted) {
-      room.difficulty = difficulty;
-      io.to(roomCode).emit('settingsUpdated', { difficulty, category: room.category });
-    }
-  });
-
-  socket.on('changeCategory', ({ roomCode, category }) => {
-    const room = rooms.get(roomCode);
-    if (room && !room.gameStarted) {
-      room.category = category;
-      io.to(roomCode).emit('settingsUpdated', { difficulty: room.difficulty, category });
-    }
-  });
-
   socket.on('startGame', (roomCode) => {
     const room = rooms.get(roomCode);
     if (!room || room.gameStarted || room.players.length < 2) {
@@ -425,12 +586,13 @@ io.on('connection', (socket) => {
 
     room.gameStarted = true;
     room.currentPlayer = 0;
+    room.gamePhase = 'question';
     
     io.to(roomCode).emit('gameStarted', room);
     io.to(roomCode).emit('statsUpdated', getPlayerStatsForRoom(room.players));
   });
 
-  socket.on('rollDice', (roomCode) => {
+  socket.on('startTurn', (roomCode) => {
     const room = rooms.get(roomCode);
     if (!room || !room.gameStarted || room.waitingForAnswer) {
       return;
@@ -441,11 +603,11 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Send question before allowing movement
-    const question = getRandomQuestion(room.difficulty, room.category);
+    const question = getRandomQuestion();
     room.currentQuestion = question;
     room.waitingForAnswer = true;
     room.questionStartTime = Date.now();
+    room.gamePhase = 'question';
 
     io.to(roomCode).emit('questionReceived', question);
     startQuestionTimer(roomCode, question.timeLimit);
@@ -462,7 +624,6 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Clear timer
     if (timers.has(roomCode)) {
       clearInterval(timers.get(roomCode));
       timers.delete(roomCode);
@@ -472,67 +633,164 @@ io.on('connection', (socket) => {
     const isCorrect = answerIndex === question.correctAnswer;
     const timeToAnswer = Math.round((Date.now() - room.questionStartTime) / 1000);
 
-    // Update player stats
     updatePlayerStats(currentPlayer.name, isCorrect, timeToAnswer);
 
     if (isCorrect) {
       currentPlayer.money += 100;
-      
-      // Roll dice and move
-      const dice1 = Math.floor(Math.random() * 6) + 1;
-      const dice2 = Math.floor(Math.random() * 6) + 1;
-      const totalRoll = dice1 + dice2;
-      
-      currentPlayer.position = (currentPlayer.position + totalRoll) % 40;
-      
-      io.to(roomCode).emit('answerResult', {
-        correct: true,
-        explanation: question.explanation,
-        playerName: currentPlayer.name,
-        diceRoll: totalRoll,
-        newPosition: currentPlayer.position
-      });
-    } else {
-      io.to(roomCode).emit('answerResult', {
-        correct: false,
-        explanation: question.explanation,
-        playerName: currentPlayer.name
-      });
+      room.gamePhase = 'dice';
     }
 
-    // Move to next player after showing results
-    setTimeout(() => {
-      room.waitingForAnswer = false;
-      room.currentQuestion = null;
-      room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
-      io.to(roomCode).emit('gameUpdated', room);
-      io.to(roomCode).emit('statsUpdated', getPlayerStatsForRoom(room.players));
-    }, 3000);
+    io.to(roomCode).emit('answerResult', {
+      correct: isCorrect,
+      explanation: question.explanation,
+      playerName: currentPlayer.name
+    });
+
+    room.waitingForAnswer = false;
+    room.currentQuestion = null;
+
+    if (!isCorrect) {
+      setTimeout(() => {
+        room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
+        room.gamePhase = 'question';
+        io.to(roomCode).emit('gameUpdated', room);
+      }, 3000);
+    }
+
+    io.to(roomCode).emit('gameUpdated', room);
+    io.to(roomCode).emit('statsUpdated', getPlayerStatsForRoom(room.players));
+  });
+
+  socket.on('rollDice', (roomCode) => {
+    const room = rooms.get(roomCode);
+    if (!room || !room.gameStarted || room.gamePhase !== 'dice') {
+      return;
+    }
+
+    const currentPlayer = room.players[room.currentPlayer];
+    if (currentPlayer.id !== socket.id) {
+      return;
+    }
+
+    const dice1 = Math.floor(Math.random() * 6) + 1;
+    const dice2 = Math.floor(Math.random() * 6) + 1;
+    const totalRoll = dice1 + dice2;
+
+    const oldPosition = currentPlayer.position;
+    const newPosition = (oldPosition + totalRoll) % 40;
+    currentPlayer.position = newPosition;
+
+    // Check for passing GO
+    if (newPosition < oldPosition) {
+      currentPlayer.money += 200;
+    }
+
+    const landedSpace = boardSpaces[newPosition];
+    const property = room.properties[newPosition];
+
+    // Handle landing on different spaces
+    let canBuyProperty = false;
+    let rentOwed = 0;
+
+    if (landedSpace.type === 'property' || landedSpace.type === 'station' || landedSpace.type === 'utility') {
+      if (!property.owner) {
+        canBuyProperty = true;
+      } else if (property.owner !== currentPlayer.name) {
+        rentOwed = calculateRent(newPosition, property.owner, room.properties, totalRoll);
+      }
+    }
+
+    if (landedSpace.type === 'tax') {
+      currentPlayer.money -= landedSpace.rent[0];
+    }
+
+    // Handle rent payment
+    if (rentOwed > 0) {
+      currentPlayer.money -= rentOwed;
+      const owner = room.players.find(p => p.name === property.owner);
+      if (owner) {
+        owner.money += rentOwed;
+      }
+    }
+
+    io.to(roomCode).emit('diceRolled', {
+      dice: [dice1, dice2],
+      newPosition,
+      canBuyProperty,
+      rentOwed,
+      passedGo: newPosition < oldPosition
+    });
+
+    room.gamePhase = canBuyProperty ? 'property' : 'endTurn';
+    io.to(roomCode).emit('gameUpdated', room);
+  });
+
+  socket.on('buyProperty', ({ roomCode, propertyIndex }) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.gamePhase !== 'property') {
+      return;
+    }
+
+    const currentPlayer = room.players[room.currentPlayer];
+    if (currentPlayer.id !== socket.id) {
+      return;
+    }
+
+    const space = boardSpaces[propertyIndex];
+    const property = room.properties[propertyIndex];
+
+    if (currentPlayer.money >= space.price && !property.owner) {
+      currentPlayer.money -= space.price;
+      property.owner = currentPlayer.name;
+      currentPlayer.properties.push(propertyIndex);
+
+      room.gamePhase = 'endTurn';
+      
+      io.to(roomCode).emit('propertyPurchased', {
+        playerName: currentPlayer.name,
+        propertyName: space.name,
+        price: space.price,
+        gameData: room
+      });
+    }
+  });
+
+  socket.on('endTurn', (roomCode) => {
+    const room = rooms.get(roomCode);
+    if (!room || room.gamePhase !== 'endTurn') {
+      return;
+    }
+
+    const currentPlayer = room.players[room.currentPlayer];
+    if (currentPlayer.id !== socket.id) {
+      return;
+    }
+
+    room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
+    room.gamePhase = 'question';
+    
+    io.to(roomCode).emit('gameUpdated', room);
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
     
-    // Find and update rooms where this player was present
     for (const [roomCode, room] of rooms.entries()) {
       const playerIndex = room.players.findIndex(p => p.id === socket.id);
       if (playerIndex !== -1) {
         room.players.splice(playerIndex, 1);
         
         if (room.players.length === 0) {
-          // Clean up empty room
           if (timers.has(roomCode)) {
             clearInterval(timers.get(roomCode));
             timers.delete(roomCode);
           }
           rooms.delete(roomCode);
         } else {
-          // Assign new host if needed
           if (room.players.length > 0 && !room.players.find(p => p.isHost)) {
             room.players[0].isHost = true;
           }
           
-          // Adjust current player if needed
           if (room.currentPlayer >= room.players.length) {
             room.currentPlayer = 0;
           }
