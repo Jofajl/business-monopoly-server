@@ -285,6 +285,296 @@ const questionBank = {
     ]
   },
 
+  // CHAPTER 3 - Quality and compliance
+  quality_compliance: {
+    easy: [
+      {
+        question: "What is the difference between maintaining quality and improving quality?",
+        options: ["No difference", "Maintaining keeps current standards, improving raises them", "Improving is cheaper", "Maintaining is only for large companies"],
+        correctAnswer: 1,
+        explanation: "Maintaining quality ensures current standards don't deteriorate, while improving quality involves planned efforts to raise standards beyond current levels."
+      },
+      {
+        question: "What does BSI stand for?",
+        options: ["British Safety Institute", "British Standards Institution", "Business Standards International", "Basic Safety Instructions"],
+        correctAnswer: 1,
+        explanation: "BSI stands for British Standards Institution, the UK's national standards body founded in 1901."
+      },
+      {
+        question: "What is quality assurance?",
+        options: ["A one-time check", "A process to ensure quality standards are maintained", "Only for manufacturing", "A type of insurance"],
+        correctAnswer: 1,
+        explanation: "Quality assurance is a process or system followed to ensure the quality of services or products is maintained and meets quality standards."
+      },
+      {
+        question: "What does the BSI Kitemark represent?",
+        options: ["A company logo", "Proof of quality standards", "A safety warning", "A price guarantee"],
+        correctAnswer: 1,
+        explanation: "The BSI Kitemark is a symbol that confirms a product or service meets the standard set by the British Standards Institution."
+      },
+      {
+        question: "How many types of quality audits are there?",
+        options: ["Two", "Three", "Four", "Five"],
+        correctAnswer: 1,
+        explanation: "There are three types of quality audits: first-party (internal), second-party (customer), and third-party (independent)."
+      },
+      {
+        question: "What does ISO stand for?",
+        options: ["International Safety Organization", "International Standards Organization", "Internal Systems Operation", "Industrial Safety Office"],
+        correctAnswer: 1,
+        explanation: "ISO stands for International Organization for Standardization, an independent, non-governmental international organization."
+      },
+      {
+        question: "What is a process checklist used for?",
+        options: ["Shopping lists", "Ensuring all steps are followed correctly", "Employee schedules", "Budget planning"],
+        correctAnswer: 1,
+        explanation: "Process checklists provide evidence that each step in a process is followed and completed in the correct order."
+      },
+      {
+        question: "What does PDSA stand for?",
+        options: ["Plan-Do-Study-Act", "Plan-Develop-Study-Analyze", "Prepare-Do-See-Act", "Plan-Design-Study-Apply"],
+        correctAnswer: 0,
+        explanation: "PDSA stands for Plan-Do-Study-Act, a cyclical method for quality improvement based on the Kaizen method."
+      }
+    ],
+    medium: [
+      {
+        question: "What are the key differences between public and private sector quality approaches in terms of budgeting?",
+        options: ["No differences", "Private sector can move money between departments more easily", "Public sector has unlimited budgets", "Private sector doesn't need budgets"],
+        correctAnswer: 1,
+        explanation: "Private sector organizations can move money between departments if there's a case for increasing quality activities, while public sector budgets are more constrained by government allocation."
+      },
+      {
+        question: "Which of the following is NOT a benefit of quality improvement?",
+        options: ["Increased customer satisfaction", "Reduced costs", "Higher employee turnover", "Enhanced reputation"],
+        correctAnswer: 2,
+        explanation: "Higher employee turnover is not a benefit of quality improvement. Quality improvement typically leads to increased customer satisfaction, reduced costs, and enhanced reputation."
+      },
+      {
+        question: "What is the purpose of documentary standards?",
+        options: ["To create documents", "To ensure standard interpretation of terms", "To store files", "To print papers"],
+        correctAnswer: 1,
+        explanation: "Documentary standards ensure there is a standard interpretation of terms, components, definitions, and materials across industries."
+      },
+      {
+        question: "What does EFQM focus on?",
+        options: ["Setting mandatory standards", "Business excellence through self-assessment", "Government regulations", "Financial auditing"],
+        correctAnswer: 1,
+        explanation: "EFQM focuses on business excellence and provides a framework for organizations to assess their performance and manage change, rather than setting mandatory standards."
+      },
+      {
+        question: "What is the main purpose of regulatory bodies?",
+        options: ["Make profits", "Set and monitor compliance with standards", "Provide training", "Sell products"],
+        correctAnswer: 1,
+        explanation: "Regulatory bodies are appointed by governments to set standards that organizations must meet and monitor compliance through inspections and audits."
+      },
+      {
+        question: "What can happen if an organization fails to comply with regulatory requirements?",
+        options: ["Nothing happens", "Criminal proceedings, fines, or business closure", "Just a warning", "Only paperwork issues"],
+        correctAnswer: 1,
+        explanation: "Failure to comply with regulatory requirements can result in serious consequences including criminal proceedings, large fines, or inability to operate."
+      },
+      {
+        question: "What is benchmarking in quality management?",
+        options: ["Setting up furniture", "Comparing performance against competitors or best practices", "Making benchmarks", "Creating standards"],
+        correctAnswer: 1,
+        explanation: "Benchmarking involves comparing an organization's performance against competitors or industry best practices to identify areas for improvement."
+      },
+      {
+        question: "What is the primary purpose of cause and effect analysis?",
+        options: ["To assign blame", "To visually identify problem causes and solutions", "To create diagrams", "To eliminate employees"],
+        correctAnswer: 1,
+        explanation: "Cause and effect analysis uses visual representation to help identify the root causes of problems and develop appropriate solutions."
+      }
+    ],
+    hard: [
+      {
+        question: "How does accountability in quality management differ between public and private sectors?",
+        options: ["No difference", "Private sector has clearer accountability lines due to simpler structures", "Public sector is always more accountable", "Private sector has no accountability"],
+        correctAnswer: 1,
+        explanation: "Private sector organizations typically have clearer accountability lines due to simpler organizational structures and common purpose, while public sector accountability can be complex due to multiple stakeholders and reporting lines."
+      },
+      {
+        question: "What is the relationship between ISO 9001 and BS 5750?",
+        options: ["They are unrelated", "ISO 9001 was based on the BSI standard BS 5750", "BS 5750 copied ISO 9001", "They are identical"],
+        correctAnswer: 1,
+        explanation: "The first version of ISO 9001 Quality Management was based on the BSI standard BS 5750, demonstrating how national standards can become templates for international standards."
+      },
+      {
+        question: "What powers do regulatory authorities typically have?",
+        options: ["Only advisory powers", "Prohibition notices, closure, and suspension", "Just recommendation powers", "No enforcement powers"],
+        correctAnswer: 1,
+        explanation: "Regulatory authorities have significant enforcement powers including issuing prohibition notices, ordering closures, and suspending operations when organizations fail to comply with standards."
+      },
+      {
+        question: "How does the EFQM Excellence Model differ from BSI and ISO approaches?",
+        options: ["No difference", "EFQM provides a framework for assessment rather than setting specific standards", "EFQM only works in Europe", "EFQM is mandatory"],
+        correctAnswer: 1,
+        explanation: "Unlike BSI and ISO which set specific standards, EFQM provides a framework that organizations can use to assess their performance and manage change, focusing on business excellence rather than compliance."
+      },
+      {
+        question: "What is the significance of the fishbone diagram in quality management?",
+        options: ["It's just decorative", "It provides visual analysis of root causes and their relationships", "It's only for fish processing", "It replaces all other quality tools"],
+        correctAnswer: 1,
+        explanation: "The fishbone diagram is a cause and effect analysis tool that visually represents problems and their potential causes, helping teams systematically identify root causes and solutions."
+      },
+      {
+        question: "How do first-party, second-party, and third-party audits differ in their objectivity and purpose?",
+        options: ["They are all the same", "First-party is internal self-assessment, second-party is customer-driven, third-party is independent", "Only third-party audits matter", "First-party is most objective"],
+        correctAnswer: 1,
+        explanation: "First-party audits are internal self-assessments, second-party audits are conducted by or for customers, and third-party audits are independent assessments, each serving different purposes with varying levels of objectivity."
+      }
+    ]
+  },
+
+  // CHAPTER 5 - Policies and procedures
+  policies_procedures: {
+    easy: [
+      {
+        question: "What is the difference between a policy and a procedure?",
+        options: ["No difference", "Policy sets direction, procedure gives specific steps", "Procedures are more important", "Policies are always longer"],
+        correctAnswer: 1,
+        explanation: "A policy provides formal guidance on what should be done to achieve aims and objectives, while procedures outline the specific steps employees must follow."
+      },
+      {
+        question: "What does KPI stand for?",
+        options: ["Key Performance Indicator", "Key Process Information", "Key Policy Implementation", "Key Personnel Index"],
+        correctAnswer: 0,
+        explanation: "KPI stands for Key Performance Indicator, which measures performance over time for specific objectives."
+      },
+      {
+        question: "What are the three main sectors of the economy?",
+        options: ["Big, medium, small", "Public, private, not-for-profit", "Local, national, international", "Manufacturing, service, retail"],
+        correctAnswer: 1,
+        explanation: "The three main sectors are public sector (government-funded), private sector (profit-making), and not-for-profit organizations."
+      },
+      {
+        question: "What is workflow?",
+        options: ["Employee schedules", "The order work passes through from start to finish", "Water flow in offices", "Computer programs"],
+        correctAnswer: 1,
+        explanation: "Workflow is the order in which a piece of work passes through from the start of a procedure to its completion."
+      },
+      {
+        question: "What does RAG rating stand for?",
+        options: ["Red-Amber-Green", "Risk Assessment Guide", "Rapid Action Group", "Regional Analysis Grid"],
+        correctAnswer: 0,
+        explanation: "RAG rating stands for Red-Amber-Green, a traffic light system for assessing performance against targets."
+      },
+      {
+        question: "What is the purpose of version control in policies?",
+        options: ["To confuse people", "To track changes and updates", "To make documents longer", "To increase costs"],
+        correctAnswer: 1,
+        explanation: "Version control tracks changes and updates to policies and procedures, ensuring everyone uses the current version."
+      },
+      {
+        question: "What is cascading in the context of KPIs?",
+        options: ["Water falling", "Passing information from one level to another", "Deleting information", "Creating confusion"],
+        correctAnswer: 1,
+        explanation: "Cascading is the process of passing information from one organizational level to another until everyone who needs it has received it."
+      },
+      {
+        question: "What is a stakeholder?",
+        options: ["Someone who owns stakes", "Anyone with an interest in the company", "Only shareholders", "Only employees"],
+        correctAnswer: 1,
+        explanation: "A stakeholder is any individual or group with an interest in the company, including employees, customers, suppliers, and shareholders."
+      }
+    ],
+    medium: [
+      {
+        question: "What are the key characteristics that a good policy should have?",
+        options: ["Long and complex", "Clear, understandable, concise, and up-to-date", "Vague and flexible", "Technical and confusing"],
+        correctAnswer: 1,
+        explanation: "Good policies should be written in plain language, be concise, reflect current legal requirements, and provide clear understanding of what is and isn't allowed."
+      },
+      {
+        question: "What is the difference between flexible and inflexible policies?",
+        options: ["Flexible policies can be adjusted by management, inflexible ones cannot", "No difference", "Inflexible policies are better", "Flexible policies are illegal"],
+        correctAnswer: 0,
+        explanation: "Flexible policies can be reviewed and adjusted when needed by senior management, while inflexible policies must be adhered to without change, often due to legal or regulatory requirements."
+      },
+      {
+        question: "What are the three main types of KPIs mentioned in the text?",
+        options: ["Easy, medium, hard", "Strategic, financial, operational", "Internal, external, mixed", "Daily, weekly, monthly"],
+        correctAnswer: 1,
+        explanation: "The three main types of KPIs are strategic (overall success), financial (monetary terms), and operational (day-to-day work activities)."
+      },
+      {
+        question: "What is the purpose of competitive market analysis?",
+        options: ["To copy competitors", "To research competitors' products, marketing, and sales to improve performance", "To sabotage competitors", "To merge with competitors"],
+        correctAnswer: 1,
+        explanation: "Competitive market analysis involves researching competitors to identify where they outperform you and where you can improve your own products and methods."
+      },
+      {
+        question: "What should be included in the layout of policies and procedures?",
+        options: ["Only the title", "Title, purpose, scope, roles and responsibilities, and version control", "Just the procedures", "Only legal requirements"],
+        correctAnswer: 1,
+        explanation: "Policies and procedures should include title, purpose, scope, roles and responsibilities, steps, and version control as minimum requirements."
+      },
+      {
+        question: "What is the difference between quantitative and qualitative KPIs?",
+        options: ["No difference", "Quantitative uses numbers, qualitative uses opinions/experience", "Qualitative is better", "Quantitative is only for finance"],
+        correctAnswer: 1,
+        explanation: "Quantitative KPIs measure numbers and countable data, while qualitative KPIs are based on opinions, experience, and subjective assessments."
+      },
+      {
+        question: "What are the main steps in developing a policy?",
+        options: ["Just write it", "Identify need, justify, assign responsibility, consult stakeholders, research", "Copy from competitors", "Ask employees only"],
+        correctAnswer: 1,
+        explanation: "Policy development involves identifying the need, justifying it, assigning responsibility, consulting with stakeholders and end users, and researching best practices."
+      },
+      {
+        question: "What is the difference between lagging and leading KPIs?",
+        options: ["No difference", "Lagging measures past results, leading predicts future outcomes", "Leading is always better", "Lagging is for large companies only"],
+        correctAnswer: 1,
+        explanation: "Lagging KPIs measure whether past events or changes resulted in improvement, while leading KPIs predict or forecast likely outcomes from changes."
+      }
+    ],
+    hard: [
+      {
+        question: "How do mandatory and non-mandatory policies differ in their legal implications and organizational flexibility?",
+        options: ["They are identical", "Mandatory policies have legal/regulatory requirements and less flexibility, non-mandatory can be changed more easily", "Non-mandatory policies are always better", "Only large companies need mandatory policies"],
+        correctAnswer: 1,
+        explanation: "Mandatory policies are required by law or regulation with serious consequences for non-compliance and limited flexibility, while non-mandatory policies can be adapted by organizations as needed."
+      },
+      {
+        question: "What is the relationship between cost-effect analysis, process flow analysis, and logic models in KPI measurement?",
+        options: ["They are unrelated", "They are different models for indirectly measuring KPIs when direct measurement isn't possible", "Only cost-effect analysis matters", "They replace KPIs entirely"],
+        correctAnswer: 1,
+        explanation: "These are different analytical models used when KPIs cannot be measured directly, each providing different approaches to obtain data through indirect measurement methods."
+      },
+      {
+        question: "How do the policy development processes differ between for-profit, not-for-profit, and social enterprise organizations?",
+        options: ["No differences", "Each type has different priorities and stakeholder considerations affecting policy focus", "Only for-profit organizations need policies", "All organizations use identical policies"],
+        correctAnswer: 1,
+        explanation: "Different organization types have varying purposes (profit vs. social benefit), stakeholders, and regulatory requirements, leading to different policy priorities and development approaches."
+      },
+      {
+        question: "What is the significance of performance monitoring processes in validating KPI effectiveness?",
+        options: ["Performance monitoring is unnecessary", "It ensures KPIs actually measure what they're supposed to and remain relevant", "It only applies to employee performance", "It's just paperwork"],
+        correctAnswer: 1,
+        explanation: "Performance monitoring processes validate that KPIs are achieving expected outcomes, measuring relevant aspects, and remaining current with organizational needs."
+      },
+      {
+        question: "How do inputs, process, and outputs KPIs work together to provide comprehensive performance measurement?",
+        options: ["They work independently", "They provide a complete view by measuring resources, activities, and results respectively", "Only outputs matter", "They measure the same things"],
+        correctAnswer: 1,
+        explanation: "Input KPIs measure resources needed, process KPIs monitor performance of activities, and output KPIs measure results, providing comprehensive coverage of the entire process."
+      },
+      {
+        question: "What are the potential negative impacts of poorly designed policies and procedures on both staff and organizations?",
+        options: ["No negative impacts", "Can cause confusion, delays, legal issues, employee dissatisfaction, and regulatory non-compliance", "Only affects small companies", "Only impacts are positive"],
+        correctAnswer: 1,
+        explanation: "Poorly designed policies can lead to staff confusion, delays, mistakes, dissatisfaction, legal non-compliance, fines, reputational damage, and loss of customers or employees."
+      },
+      {
+        question: "How does the updating and maintenance cycle of policies and procedures ensure continuous organizational effectiveness?",
+        options: ["It doesn't matter", "Regular review identifies issues, incorporates changes, and maintains relevance to current needs", "Policies should never change", "Only yearly updates are needed"],
+        correctAnswer: 1,
+        explanation: "Regular review and maintenance ensures policies remain effective, incorporate internal and external changes, address emerging issues, and continue to support organizational objectives."
+      }
+    ]
+  },
+
   // General Business Questions
   general: {
     easy: [
