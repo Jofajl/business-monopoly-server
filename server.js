@@ -627,6 +627,25 @@ function generateRoomCode() {
   return Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
+// NEW: Helper function to get taken pieces in a room
+function getTakenPieces(room) {
+  return room.players.map(player => player.selectedPiece).filter(piece => piece);
+}
+
+// NEW: Add to your existing player data structure
+function createPlayer(name, selectedPiece, isHost = false, socketId = null) {
+  return {
+    id: socketId,
+    name,
+    selectedPiece, // NEW: Store the selected piece
+    money: 1500,
+    position: 0,
+    properties: [],
+    isHost,
+    socketId // NEW: Store socket ID for disconnect handling
+  };
+}
+
 function getRandomQuestion() {
   // Flatten all questions from all categories and difficulties into one array
   const allQuestions = [];
@@ -816,17 +835,14 @@ function handleQuestionTimeout(roomCode) {
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  socket.on('createRoom', ({ playerName }) => {
+  // MODIFIED: Room creation handler with piece selection
+  socket.on('createRoom', (data) => {
+    const { playerName, selectedPiece } = data; // Extract piece data
     const roomCode = generateRoomCode();
-    const player = {
-      id: socket.id,
-      name: playerName,
-      money: 1500,
-      position: 0,
-      properties: [],
-      isHost: true
-    };
-
+    
+    // Create player with selected piece and socket ID
+    const player = createPlayer(playerName, selectedPiece, true, socket.id);
+    
     initializePlayerStats(playerName);
 
     const room = {
@@ -843,11 +859,21 @@ io.on('connection', (socket) => {
 
     rooms.set(roomCode, room);
     socket.join(roomCode);
-    socket.emit('roomCreated', roomCode);
+    
+    // Send room created with taken pieces info
+    socket.emit('roomCreated', {
+      roomCode: roomCode,
+      takenPieces: getTakenPieces(room)
+    });
+    
+    console.log(`Room ${roomCode} created by ${playerName} with piece ${selectedPiece}`);
   });
 
-  socket.on('joinRoom', ({ roomCode, playerName }) => {
+  // MODIFIED: Room joining handler with piece selection
+  socket.on('joinRoom', (data) => {
+    const { roomCode, playerName, selectedPiece } = data; // Extract piece data
     const room = rooms.get(roomCode);
+    
     if (!room) {
       socket.emit('error', 'Room not found');
       return;
@@ -863,21 +889,39 @@ io.on('connection', (socket) => {
       return;
     }
 
-    const player = {
-      id: socket.id,
-      name: playerName,
-      money: 1500,
-      position: 0,
-      properties: [],
-      isHost: false
-    };
+    // Check if piece is already taken
+    const takenPieces = getTakenPieces(room);
+    if (takenPieces.includes(selectedPiece)) {
+      socket.emit('error', `The ${selectedPiece} piece is already taken. Please select a different piece.`);
+      return;
+    }
 
+    // Check if player name already exists
+    if (room.players.some(p => p.name === playerName)) {
+      socket.emit('error', 'Player name already taken in this room');
+      return;
+    }
+
+    // Add player with selected piece and socket ID
+    const player = createPlayer(playerName, selectedPiece, false, socket.id);
+    
     initializePlayerStats(playerName);
     room.players.push(player);
     socket.join(roomCode);
     
-    socket.emit('roomJoined', { roomCode, players: room.players });
-    io.to(roomCode).emit('playersUpdated', room.players);
+    // Notify player they joined successfully
+    socket.emit('roomJoined', {
+      roomCode: roomCode,
+      players: room.players
+    });
+    
+    // Update all players in room about new player and piece availability
+    io.to(roomCode).emit('playersUpdated', {
+      players: room.players,
+      takenPieces: getTakenPieces(room)
+    });
+    
+    console.log(`${playerName} joined room ${roomCode} with piece ${selectedPiece}`);
   });
 
   socket.on('startGame', (roomCode) => {
@@ -1074,14 +1118,25 @@ io.on('connection', (socket) => {
     io.to(roomCode).emit('gameUpdated', room);
   });
 
+  // MODIFIED: Enhanced disconnect handling with piece availability updates
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
     
+    // Find which room the player was in
     for (const [roomCode, room] of rooms.entries()) {
-      const playerIndex = room.players.findIndex(p => p.id === socket.id);
+      const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
+      
       if (playerIndex !== -1) {
+        const playerName = room.players[playerIndex].name;
         room.players.splice(playerIndex, 1);
         
+        // Update piece availability for remaining players
+        io.to(roomCode).emit('playersUpdated', {
+          players: room.players,
+          takenPieces: getTakenPieces(room)
+        });
+        
+        // If no players left, delete room
         if (room.players.length === 0) {
           if (timers.has(roomCode)) {
             clearInterval(timers.get(roomCode));
@@ -1089,19 +1144,23 @@ io.on('connection', (socket) => {
           }
           rooms.delete(roomCode);
         } else {
-          if (room.players.length > 0 && !room.players.find(p => p.isHost)) {
+          // If host left, make first remaining player the host
+          if (!room.players.find(p => p.isHost)) {
             room.players[0].isHost = true;
           }
           
+          // Adjust current player index if needed
           if (room.currentPlayer >= room.players.length) {
             room.currentPlayer = 0;
           }
           
-          io.to(roomCode).emit('playersUpdated', room.players);
           if (room.gameStarted) {
             io.to(roomCode).emit('gameUpdated', room);
           }
         }
+        
+        console.log(`${playerName} disconnected from room ${roomCode}`);
+        break;
       }
     }
   });
