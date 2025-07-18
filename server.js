@@ -1055,14 +1055,14 @@ io.on('connection', (socket) => {
       currentPlayer.money -= landedSpace.rent[0];
     }
 
-// Handle rent payment
-if (rentOwed > 0) {
-  currentPlayer.money -= rentOwed;
-  const owner = room.players.find(p => p.name === property.owner);
-  if (owner) {
-    owner.money += rentOwed;
-  }
-}
+    // Handle rent payment
+    if (rentOwed > 0) {
+      currentPlayer.money -= rentOwed;
+      const owner = room.players.find(p => p.name === property.owner);
+      if (owner) {
+        owner.money += rentOwed;
+      }
+    }
 
     io.to(roomCode).emit('diceRolled', {
       dice: [dice1, dice2],
