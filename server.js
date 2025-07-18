@@ -627,14 +627,16 @@ function generateRoomCode() {
   return Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
-function getRandomQuestion() {
-  // Flatten all questions from all categories and difficulties into one array
+// NEW: Function to build all questions array with unique IDs
+function buildAllQuestions() {
   const allQuestions = [];
+  let questionId = 0;
   
   Object.keys(questionBank).forEach(category => {
     Object.keys(questionBank[category]).forEach(difficulty => {
       questionBank[category][difficulty].forEach(question => {
         allQuestions.push({
+          id: questionId++,
           ...question,
           category,
           difficulty,
@@ -644,21 +646,58 @@ function getRandomQuestion() {
     });
   });
   
-  if (allQuestions.length === 0) {
-    // Fallback question if no questions are available
-    return {
-      question: "What does ROI stand for?",
-      options: ["Return on Investment", "Rate of Interest", "Risk of Investment", "Revenue of Income"],
-      correctAnswer: 0,
-      explanation: "ROI (Return on Investment) measures the efficiency of an investment by comparing the gain or loss relative to its cost.",
-      category: 'general',
-      difficulty: 'medium',
-      timeLimit: 30
-    };
+  return allQuestions;
+}
+
+// NEW: Modified function to get random question from unused pool
+function getRandomQuestion(roomCode) {
+  const room = rooms.get(roomCode);
+  if (!room) {
+    console.error('Room not found:', roomCode);
+    return getFallbackQuestion();
   }
   
-  const randomIndex = Math.floor(Math.random() * allQuestions.length);
-  return allQuestions[randomIndex];
+  // Initialize question pools if not exists
+  if (!room.allQuestions) {
+    room.allQuestions = buildAllQuestions();
+    room.usedQuestions = [];
+  }
+  
+  // Get unused questions
+  const unusedQuestions = room.allQuestions.filter(q => !room.usedQuestions.includes(q.id));
+  
+  // If no unused questions, reset the pool
+  if (unusedQuestions.length === 0) {
+    console.log(`All questions used in room ${roomCode}, resetting pool`);
+    room.usedQuestions = [];
+    room.allQuestions = buildAllQuestions(); // Rebuild to ensure fresh pool
+    return getRandomQuestion(roomCode); // Recursive call with reset pool
+  }
+  
+  // Pick random question from unused pool
+  const randomIndex = Math.floor(Math.random() * unusedQuestions.length);
+  const selectedQuestion = unusedQuestions[randomIndex];
+  
+  // Mark question as used
+  room.usedQuestions.push(selectedQuestion.id);
+  
+  console.log(`Selected question ID ${selectedQuestion.id} from pool of ${unusedQuestions.length} unused questions`);
+  
+  return selectedQuestion;
+}
+
+// NEW: Fallback question function
+function getFallbackQuestion() {
+  return {
+    id: -1,
+    question: "What does ROI stand for?",
+    options: ["Return on Investment", "Rate of Interest", "Risk of Investment", "Revenue of Income"],
+    correctAnswer: 0,
+    explanation: "ROI (Return on Investment) measures the efficiency of an investment by comparing the gain or loss relative to its cost.",
+    category: 'general',
+    difficulty: 'medium',
+    timeLimit: 30
+  };
 }
 
 function initializePlayerStats(playerName) {
@@ -838,7 +877,10 @@ io.on('connection', (socket) => {
       currentQuestion: null,
       questionStartTime: null,
       properties: initializeProperties(),
-      gamePhase: 'question'
+      gamePhase: 'question',
+      // NEW: Initialize question tracking
+      allQuestions: null,
+      usedQuestions: []
     };
 
     rooms.set(roomCode, room);
@@ -890,6 +932,12 @@ io.on('connection', (socket) => {
     room.currentPlayer = 0;
     room.gamePhase = 'question';
     
+    // NEW: Initialize question pools when game starts
+    room.allQuestions = buildAllQuestions();
+    room.usedQuestions = [];
+    
+    console.log(`Game started in room ${roomCode} with ${room.allQuestions.length} questions available`);
+    
     io.to(roomCode).emit('gameStarted', room);
     io.to(roomCode).emit('statsUpdated', getPlayerStatsForRoom(room.players));
   });
@@ -905,7 +953,8 @@ io.on('connection', (socket) => {
       return;
     }
 
-    const question = getRandomQuestion();
+    // NEW: Use the modified getRandomQuestion function
+    const question = getRandomQuestion(roomCode);
     room.currentQuestion = question;
     room.waitingForAnswer = true;
     room.questionStartTime = Date.now();
